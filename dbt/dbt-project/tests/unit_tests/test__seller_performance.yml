@@ -1,0 +1,27 @@
+unit_tests:
+  - name: test__seller_performance
+    model: seller_performance
+    description: "Validates seller shipment counts and RTO logic"
+
+    given:
+      - input: ref('fact_orders')
+        rows:
+          - { ORDER_ID: "O1", PRODUCT_ID: "P1" }
+          - { ORDER_ID: "O2", PRODUCT_ID: "P1" }
+
+      - input:  source('silver','FACT_SHIPMENTS')
+        rows:
+          - { SHIPMENT_ID: "S1", ORDER_ID: "O1", DELIVERY_TAT_DAYS: 2, RTO_FLAG: true }
+          - { SHIPMENT_ID: "S2", ORDER_ID: "O2", DELIVERY_TAT_DAYS: 3, RTO_FLAG: false }
+
+      - input: ref('fact_inventory')
+        rows:
+          - { PRODUCT_ID: "P1", SELLER_ID: "S001" }
+
+      - input: ref('dim_sellers')
+        rows:
+          - { SELLER_ID: "S001", SELLER_NAME: "ShopX" }
+
+    expect:
+      rows:
+        - { SELLER_ID: "S001", SELLER_NAME: "ShopX", total_orders: 2, total_shipments: 2, avg_delivery_time: 2.5, rto_percentage: 50.0 }

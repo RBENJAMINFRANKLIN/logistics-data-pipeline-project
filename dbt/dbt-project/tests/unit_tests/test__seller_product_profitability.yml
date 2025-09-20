@@ -1,0 +1,47 @@
+version: 2
+
+unit_tests:
+  - name: test__seller_product_profitability
+    model: seller_product_profitability
+    description: "Validates revenue, logistics cost, profit, and margin aggregation by seller and product"
+
+    given:
+      - input: ref('fact_orders')
+        rows:
+          - { ORDER_ID: "O1", ORDER_DATE: "2024-06-01", PRODUCT_ID: "P1", CUSTOMER_ID: "C1", TOTAL_AMOUNT: 1000.00, PAYMENT_METHOD: "COD" }
+          - { ORDER_ID: "O2", ORDER_DATE: "2024-06-02", PRODUCT_ID: "P1", CUSTOMER_ID: "C2", TOTAL_AMOUNT: 500.00, PAYMENT_METHOD: "Prepaid" }
+
+      - input: source('silver', 'FACT_SHIPMENTS')
+        rows:
+          - { SHIPMENT_ID: "S1", ORDER_ID: "O1", SELLER_ID: "S001", CARRIER_ID: "C001", CHANNEL: "Web", SHIPPING_COST: 50.00, FUEL_SURCHARGE: 20.00, COD_FEE: 10.00, INSURANCE: 5.00, DELAY_FLAG: false, RTO_FLAG: false, DELIVERY_TAT_DAYS: 2, DELIVERED_AT: "2024-06-04", DESTINATION_PINCODE: "560001", STATUS: "Delivered" }
+          - { SHIPMENT_ID: "S2", ORDER_ID: "O2", SELLER_ID: "S001", CARRIER_ID: "C001", CHANNEL: "App", SHIPPING_COST: 30.00, FUEL_SURCHARGE: 10.00, COD_FEE: 0.00, INSURANCE: 5.00, DELAY_FLAG: false, RTO_FLAG: false, DELIVERY_TAT_DAYS: 2, DELIVERED_AT: "2024-06-03", DESTINATION_PINCODE: "560001", STATUS: "Delivered" }
+
+      - input: ref('fact_inventory')
+        rows:
+          - { ID: 1, PRODUCT_ID: "P1", SELLER_ID: "S001", STOCK: 50, LAST_UPDATED: "2024-06-01" }
+
+      - input: ref('dim_sellers')
+        rows:
+          - { SELLER_ID: "S001", SELLER_NAME: "MegaStore" }
+
+      - input: ref('dim_products')
+        rows:
+          - { PRODUCT_ID: "P1", PRODUCT_NAME: "Smartwatch", CATEGORY: "Electronics" }
+
+      - input: ref('dim_locations')
+        rows:
+          - { PINCODE: "560001", CITY: "Bangalore", STATE: "Karnataka", ZONE: "South" }
+
+    expect:
+      rows:
+        - {
+            SELLER_NAME: "MegaStore",
+            CATEGORY: "Electronics",
+            PRODUCT_NAME: "Smartwatch",
+            DELIVERY_REGION: "South",
+            total_orders: 2,
+            revenue: 1500.00,
+            logistics_expense: 130.00,
+            gross_profit: 1370.00,
+            gross_margin_pct: 91.33
+          }

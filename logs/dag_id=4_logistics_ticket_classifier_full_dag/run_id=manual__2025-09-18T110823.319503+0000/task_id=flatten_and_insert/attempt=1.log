@@ -1,0 +1,51 @@
+[2025-09-20T04:39:51.908+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-09-20T04:39:52.056+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 4_logistics_ticket_classifier_full_dag.flatten_and_insert manual__2025-09-18T11:08:23.319503+00:00 [queued]>
+[2025-09-20T04:39:52.108+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 4_logistics_ticket_classifier_full_dag.flatten_and_insert manual__2025-09-18T11:08:23.319503+00:00 [queued]>
+[2025-09-20T04:39:52.109+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2025-09-20T04:39:52.306+0000] {taskinstance.py:2330} INFO - Executing <Task(SnowflakeOperator): flatten_and_insert> on 2025-09-18 11:08:23.319503+00:00
+[2025-09-20T04:39:52.373+0000] {standard_task_runner.py:63} INFO - Started process 125 to run task
+[2025-09-20T04:39:52.397+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', '4_logistics_ticket_classifier_full_dag', 'flatten_and_insert', 'manual__2025-09-18T11:08:23.319503+00:00', '--job-id', '1092', '--raw', '--subdir', 'DAGS_FOLDER/4_logistics_ticket_classifier_full_dag.py', '--cfg-path', '/tmp/tmpkeltwi_0']
+[2025-09-20T04:39:52.414+0000] {standard_task_runner.py:91} INFO - Job 1092: Subtask flatten_and_insert
+[2025-09-20T04:39:52.778+0000] {task_command.py:426} INFO - Running <TaskInstance: 4_logistics_ticket_classifier_full_dag.flatten_and_insert manual__2025-09-18T11:08:23.319503+00:00 [running]> on host 9d1b71842418
+[2025-09-20T04:39:53.574+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='4_logistics_ticket_classifier_full_dag' AIRFLOW_CTX_TASK_ID='flatten_and_insert' AIRFLOW_CTX_EXECUTION_DATE='2025-09-18T11:08:23.319503+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-09-18T11:08:23.319503+00:00'
+[2025-09-20T04:39:53.578+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-09-20T04:39:53.642+0000] {sql.py:276} INFO - Executing: 
+            INSERT INTO LOGISTICS_DEMO_1.SILVER.customer_support_flat (
+                ticket_id,
+                customer_id,
+                message_text,
+                created_at
+            )
+            SELECT value:"ticket_id"::STRING AS ticket_id,
+                value:"customer":"id"::STRING AS customer_id,
+                value:"message":"body"::STRING AS message_text,
+                value:"created_at"::TIMESTAMP AS created_at
+                FROM LOGISTICS_DEMO_1.BRONZE.customer_support_raw,
+                LATERAL FLATTEN(input => json_data);
+        
+[2025-09-20T04:39:53.682+0000] {base.py:84} INFO - Using connection ID 'snowflakeid' for task execution.
+[2025-09-20T04:39:54.005+0000] {base.py:84} INFO - Using connection ID 'snowflakeid' for task execution.
+[2025-09-20T04:39:54.008+0000] {connection.py:521} INFO - Snowflake Connector for Python Version: 3.17.3, Python Version: 3.11.9, Platform: Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.36
+[2025-09-20T04:39:54.014+0000] {connection.py:1464} INFO - Connecting to GLOBAL Snowflake domain
+[2025-09-20T04:39:54.507+0000] {credentials.py:1278} INFO - Found credentials in shared credentials file: ~/.aws/credentials
+[2025-09-20T04:39:55.768+0000] {sql.py:470} INFO - Running statement: INSERT INTO LOGISTICS_DEMO_1.SILVER.customer_support_flat (
+                ticket_id,
+                customer_id,
+                message_text,
+                created_at
+            )
+            SELECT value:"ticket_id"::STRING AS ticket_id,
+                value:"customer":"id"::STRING AS customer_id,
+                value:"message":"body"::STRING AS message_text,
+                value:"created_at"::TIMESTAMP AS created_at
+                FROM LOGISTICS_DEMO_1.BRONZE.customer_support_raw,
+                LATERAL FLATTEN(input => json_data);, parameters: None
+[2025-09-20T04:39:55.904+0000] {sql.py:479} INFO - Rows affected: 0
+[2025-09-20T04:39:55.908+0000] {snowflake.py:407} INFO - Rows affected: 0
+[2025-09-20T04:39:55.909+0000] {snowflake.py:408} INFO - Snowflake query id: 01bf2b77-3201-f19a-000f-7c62000497b6
+[2025-09-20T04:39:56.170+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-09-20T04:39:56.273+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=4_logistics_ticket_classifier_full_dag, task_id=flatten_and_insert, run_id=manual__2025-09-18T11:08:23.319503+00:00, execution_date=20250918T110823, start_date=20250920T043952, end_date=20250920T043956
+[2025-09-20T04:39:56.465+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2025-09-20T04:39:56.560+0000] {logging_mixin.py:188} WARNING - /home/airflow/.local/lib/python3.11/site-packages/airflow/models/baseoperator.py:1296 AirflowProviderDeprecationWarning: Call to deprecated class SnowflakeOperator. (This class is deprecated. Please use `airflow.providers.common.sql.operators.sql.SQLExecuteQueryOperator`. Also, you can provide `hook_params={'warehouse': <warehouse>, 'database': <database>, 'role': <role>, 'schema': <schema>, 'authenticator': <authenticator>,'session_parameters': <session_parameters>}`.)
+[2025-09-20T04:39:56.693+0000] {taskinstance.py:3498} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-09-20T04:39:56.715+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

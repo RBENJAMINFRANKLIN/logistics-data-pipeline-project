@@ -1,0 +1,251 @@
+[2025-09-12T15:47:05.853+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-09-12T15:47:06.033+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 2_logistics_shipment_dag.json_flatten_insert_snowflake_fact manual__2025-09-12T15:45:03.098344+00:00 [queued]>
+[2025-09-12T15:47:06.082+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 2_logistics_shipment_dag.json_flatten_insert_snowflake_fact manual__2025-09-12T15:45:03.098344+00:00 [queued]>
+[2025-09-12T15:47:06.083+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 2
+[2025-09-12T15:47:06.188+0000] {taskinstance.py:2330} INFO - Executing <Task(SnowflakeOperator): json_flatten_insert_snowflake_fact> on 2025-09-12 15:45:03.098344+00:00
+[2025-09-12T15:47:06.247+0000] {standard_task_runner.py:63} INFO - Started process 1438 to run task
+[2025-09-12T15:47:06.280+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', '2_logistics_shipment_dag', 'json_flatten_insert_snowflake_fact', 'manual__2025-09-12T15:45:03.098344+00:00', '--job-id', '1067', '--raw', '--subdir', 'DAGS_FOLDER/2_logistics-shipment-dag.py', '--cfg-path', '/tmp/tmpa3v_ekvo']
+[2025-09-12T15:47:06.293+0000] {standard_task_runner.py:91} INFO - Job 1067: Subtask json_flatten_insert_snowflake_fact
+[2025-09-12T15:47:06.591+0000] {task_command.py:426} INFO - Running <TaskInstance: 2_logistics_shipment_dag.json_flatten_insert_snowflake_fact manual__2025-09-12T15:45:03.098344+00:00 [running]> on host c4b06dd52c37
+[2025-09-12T15:47:07.476+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='2_logistics_shipment_dag' AIRFLOW_CTX_TASK_ID='json_flatten_insert_snowflake_fact' AIRFLOW_CTX_EXECUTION_DATE='2025-09-12T15:45:03.098344+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-09-12T15:45:03.098344+00:00'
+[2025-09-12T15:47:07.481+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-09-12T15:47:07.566+0000] {sql.py:276} INFO - Executing: 
+
+
+                MERGE INTO LOGISTICS_DEMO_1.SILVER.fact_SHIPMENTS tgt
+                USING (
+                    -- Deduplicate source by (order_id, carrier_id, seller_id)
+                    WITH flattened_shipments AS (
+                        SELECT
+                            shipment.value:shipment_id::STRING AS shipment_id,
+                            shipment.value AS shipment_json
+                        FROM LOGISTICS_DEMO_1.BRONZE.shipment_raw,
+                            LATERAL FLATTEN(input => value) shipment
+                    ),
+                    status_created AS (
+                        SELECT
+                            f.shipment_id,
+                            TRY_TO_TIMESTAMP_NTZ(status.value:timestamp::STRING) AS status_created_at
+                        FROM flattened_shipments f,
+                            LATERAL FLATTEN(input => f.shipment_json:shipment_details.status_tracking) status
+                        WHERE status.value:status::STRING = 'Created'
+                        QUALIFY ROW_NUMBER() OVER (PARTITION BY f.shipment_id ORDER BY status_created_at DESC) = 1
+                    ),
+                    status_delivered AS (
+                        SELECT
+                            f.shipment_id,
+                            TRY_TO_TIMESTAMP_NTZ(status.value:timestamp::STRING) AS status_delivered_at
+                        FROM flattened_shipments f,
+                            LATERAL FLATTEN(input => f.shipment_json:shipment_details.status_tracking) status
+                        WHERE status.value:status::STRING = 'Delivered'
+                        QUALIFY ROW_NUMBER() OVER (PARTITION BY f.shipment_id ORDER BY status_delivered_at DESC) = 1
+                    ),
+                    enriched_src AS (
+                        SELECT
+                            f.shipment_json:shipment_id::STRING AS shipment_id,
+                            f.shipment_json:carrier.carrier_id::STRING AS carrier_id,
+                            f.shipment_json:carrier.carrier_name::STRING AS carrier_name,
+                            f.shipment_json:route.origin.city::STRING AS origin_city,
+                            f.shipment_json:route.origin.pincode::STRING AS origin_pincode,
+                            f.shipment_json:route.origin.warehouse_id::STRING AS warehouse_id,
+                            f.shipment_json:route.destination.city::STRING AS destination_city,
+                            f.shipment_json:route.destination.pincode::STRING AS destination_pincode,
+                            f.shipment_json:route.destination.customer_address_type::STRING AS customer_address_type,
+                            f.shipment_json:order_reference.order_id::STRING AS order_id,
+                            f.shipment_json:order_reference.seller_id::STRING AS seller_id,
+                            f.shipment_json:order_reference.channel::STRING AS channel,
+                            f.shipment_json:charges.shipping_cost::FLOAT AS shipping_cost,
+                            f.shipment_json:charges.fuel_surcharge::FLOAT AS fuel_surcharge,
+                            f.shipment_json:charges.insurance::FLOAT AS insurance,
+                            f.shipment_json:charges.cod_fee::FLOAT AS cod_fee,
+                            f.shipment_json:shipment_details.status::STRING AS status,
+                            f.shipment_json:shipment_details.rto_flag::BOOLEAN AS rto_flag,
+                            f.shipment_json:shipment_details.delay_flag::BOOLEAN AS delay_flag,
+                            f.shipment_json:shipment_details.delivery_tat_days::INTEGER AS delivery_tat_days,
+                            TRY_TO_TIMESTAMP_NTZ(f.shipment_json:shipment_details.created_at::STRING) AS created_at,
+                            TRY_TO_TIMESTAMP_NTZ(f.shipment_json:shipment_details.delivered_at::STRING) AS delivered_at,
+                            sc.status_created_at,
+                            sd.status_delivered_at,
+                            ROW_NUMBER() OVER (
+                                PARTITION BY 
+                                    f.shipment_json:order_reference.order_id::STRING,
+                                    f.shipment_json:carrier.carrier_id::STRING,
+                                    f.shipment_json:order_reference.seller_id::STRING
+                                ORDER BY TRY_TO_TIMESTAMP_NTZ(f.shipment_json:shipment_details.created_at::STRING) DESC
+                            ) AS rn
+                        FROM flattened_shipments f
+                        LEFT JOIN status_created sc ON f.shipment_id = sc.shipment_id
+                        LEFT JOIN status_delivered sd ON f.shipment_id = sd.shipment_id
+                    )
+                    SELECT * FROM enriched_src WHERE rn = 1  -- ✅ Keep only latest per key
+                ) src
+
+                ON tgt.order_id = src.order_id
+                AND tgt.carrier_id = src.carrier_id
+                AND tgt.seller_id = src.seller_id
+
+                WHEN MATCHED THEN UPDATE SET
+                    tgt.shipment_id = src.shipment_id,
+                    tgt.carrier_name = src.carrier_name,
+                    tgt.origin_city = src.origin_city,
+                    tgt.origin_pincode = src.origin_pincode,
+                    tgt.warehouse_id = src.warehouse_id,
+                    tgt.destination_city = src.destination_city,
+                    tgt.destination_pincode = src.destination_pincode,
+                    tgt.customer_address_type = src.customer_address_type,
+                    tgt.channel = src.channel,
+                    tgt.shipping_cost = src.shipping_cost,
+                    tgt.fuel_surcharge = src.fuel_surcharge,
+                    tgt.insurance = src.insurance,
+                    tgt.cod_fee = src.cod_fee,
+                    tgt.status = src.status,
+                    tgt.rto_flag = src.rto_flag,
+                    tgt.delay_flag = src.delay_flag,
+                    tgt.delivery_tat_days = src.delivery_tat_days,
+                    tgt.created_at = src.created_at,
+                    tgt.delivered_at = src.delivered_at,
+                    tgt.status_created_at = src.status_created_at,
+                    tgt.status_delivered_at = src.status_delivered_at
+
+                WHEN NOT MATCHED THEN INSERT (
+                    shipment_id, carrier_id, carrier_name, origin_city, origin_pincode, warehouse_id,
+                    destination_city, destination_pincode, customer_address_type,
+                    order_id, seller_id, channel,
+                    shipping_cost, fuel_surcharge, insurance, cod_fee,
+                    status, rto_flag, delay_flag, delivery_tat_days,
+                    created_at, delivered_at, status_created_at, status_delivered_at
+                )
+                VALUES (
+                    src.shipment_id, src.carrier_id, src.carrier_name, src.origin_city, src.origin_pincode, src.warehouse_id,
+                    src.destination_city, src.destination_pincode, src.customer_address_type,
+                    src.order_id, src.seller_id, src.channel,
+                    src.shipping_cost, src.fuel_surcharge, src.insurance, src.cod_fee,
+                    src.status, src.rto_flag, src.delay_flag, src.delivery_tat_days,
+                    src.created_at, src.delivered_at, src.status_created_at, src.status_delivered_at
+                );
+
+
+        
+[2025-09-12T15:47:07.641+0000] {base.py:84} INFO - Using connection ID 'snowflakeid' for task execution.
+[2025-09-12T15:47:07.928+0000] {base.py:84} INFO - Using connection ID 'snowflakeid' for task execution.
+[2025-09-12T15:47:07.933+0000] {connection.py:521} INFO - Snowflake Connector for Python Version: 3.17.3, Python Version: 3.11.9, Platform: Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.36
+[2025-09-12T15:47:07.936+0000] {connection.py:1464} INFO - Connecting to GLOBAL Snowflake domain
+[2025-09-12T15:47:10.869+0000] {sql.py:470} INFO - Running statement: MERGE INTO LOGISTICS_DEMO_1.SILVER.fact_SHIPMENTS tgt
+                USING (
+                    -- Deduplicate source by (order_id, carrier_id, seller_id)
+                    WITH flattened_shipments AS (
+                        SELECT
+                            shipment.value:shipment_id::STRING AS shipment_id,
+                            shipment.value AS shipment_json
+                        FROM LOGISTICS_DEMO_1.BRONZE.shipment_raw,
+                            LATERAL FLATTEN(input => value) shipment
+                    ),
+                    status_created AS (
+                        SELECT
+                            f.shipment_id,
+                            TRY_TO_TIMESTAMP_NTZ(status.value:timestamp::STRING) AS status_created_at
+                        FROM flattened_shipments f,
+                            LATERAL FLATTEN(input => f.shipment_json:shipment_details.status_tracking) status
+                        WHERE status.value:status::STRING = 'Created'
+                        QUALIFY ROW_NUMBER() OVER (PARTITION BY f.shipment_id ORDER BY status_created_at DESC) = 1
+                    ),
+                    status_delivered AS (
+                        SELECT
+                            f.shipment_id,
+                            TRY_TO_TIMESTAMP_NTZ(status.value:timestamp::STRING) AS status_delivered_at
+                        FROM flattened_shipments f,
+                            LATERAL FLATTEN(input => f.shipment_json:shipment_details.status_tracking) status
+                        WHERE status.value:status::STRING = 'Delivered'
+                        QUALIFY ROW_NUMBER() OVER (PARTITION BY f.shipment_id ORDER BY status_delivered_at DESC) = 1
+                    ),
+                    enriched_src AS (
+                        SELECT
+                            f.shipment_json:shipment_id::STRING AS shipment_id,
+                            f.shipment_json:carrier.carrier_id::STRING AS carrier_id,
+                            f.shipment_json:carrier.carrier_name::STRING AS carrier_name,
+                            f.shipment_json:route.origin.city::STRING AS origin_city,
+                            f.shipment_json:route.origin.pincode::STRING AS origin_pincode,
+                            f.shipment_json:route.origin.warehouse_id::STRING AS warehouse_id,
+                            f.shipment_json:route.destination.city::STRING AS destination_city,
+                            f.shipment_json:route.destination.pincode::STRING AS destination_pincode,
+                            f.shipment_json:route.destination.customer_address_type::STRING AS customer_address_type,
+                            f.shipment_json:order_reference.order_id::STRING AS order_id,
+                            f.shipment_json:order_reference.seller_id::STRING AS seller_id,
+                            f.shipment_json:order_reference.channel::STRING AS channel,
+                            f.shipment_json:charges.shipping_cost::FLOAT AS shipping_cost,
+                            f.shipment_json:charges.fuel_surcharge::FLOAT AS fuel_surcharge,
+                            f.shipment_json:charges.insurance::FLOAT AS insurance,
+                            f.shipment_json:charges.cod_fee::FLOAT AS cod_fee,
+                            f.shipment_json:shipment_details.status::STRING AS status,
+                            f.shipment_json:shipment_details.rto_flag::BOOLEAN AS rto_flag,
+                            f.shipment_json:shipment_details.delay_flag::BOOLEAN AS delay_flag,
+                            f.shipment_json:shipment_details.delivery_tat_days::INTEGER AS delivery_tat_days,
+                            TRY_TO_TIMESTAMP_NTZ(f.shipment_json:shipment_details.created_at::STRING) AS created_at,
+                            TRY_TO_TIMESTAMP_NTZ(f.shipment_json:shipment_details.delivered_at::STRING) AS delivered_at,
+                            sc.status_created_at,
+                            sd.status_delivered_at,
+                            ROW_NUMBER() OVER (
+                                PARTITION BY 
+                                    f.shipment_json:order_reference.order_id::STRING,
+                                    f.shipment_json:carrier.carrier_id::STRING,
+                                    f.shipment_json:order_reference.seller_id::STRING
+                                ORDER BY TRY_TO_TIMESTAMP_NTZ(f.shipment_json:shipment_details.created_at::STRING) DESC
+                            ) AS rn
+                        FROM flattened_shipments f
+                        LEFT JOIN status_created sc ON f.shipment_id = sc.shipment_id
+                        LEFT JOIN status_delivered sd ON f.shipment_id = sd.shipment_id
+                    )
+                    SELECT * FROM enriched_src WHERE rn = 1  -- ✅ Keep only latest per key
+                ) src
+
+                ON tgt.order_id = src.order_id
+                AND tgt.carrier_id = src.carrier_id
+                AND tgt.seller_id = src.seller_id
+
+                WHEN MATCHED THEN UPDATE SET
+                    tgt.shipment_id = src.shipment_id,
+                    tgt.carrier_name = src.carrier_name,
+                    tgt.origin_city = src.origin_city,
+                    tgt.origin_pincode = src.origin_pincode,
+                    tgt.warehouse_id = src.warehouse_id,
+                    tgt.destination_city = src.destination_city,
+                    tgt.destination_pincode = src.destination_pincode,
+                    tgt.customer_address_type = src.customer_address_type,
+                    tgt.channel = src.channel,
+                    tgt.shipping_cost = src.shipping_cost,
+                    tgt.fuel_surcharge = src.fuel_surcharge,
+                    tgt.insurance = src.insurance,
+                    tgt.cod_fee = src.cod_fee,
+                    tgt.status = src.status,
+                    tgt.rto_flag = src.rto_flag,
+                    tgt.delay_flag = src.delay_flag,
+                    tgt.delivery_tat_days = src.delivery_tat_days,
+                    tgt.created_at = src.created_at,
+                    tgt.delivered_at = src.delivered_at,
+                    tgt.status_created_at = src.status_created_at,
+                    tgt.status_delivered_at = src.status_delivered_at
+
+                WHEN NOT MATCHED THEN INSERT (
+                    shipment_id, carrier_id, carrier_name, origin_city, origin_pincode, warehouse_id,
+                    destination_city, destination_pincode, customer_address_type,
+                    order_id, seller_id, channel,
+                    shipping_cost, fuel_surcharge, insurance, cod_fee,
+                    status, rto_flag, delay_flag, delivery_tat_days,
+                    created_at, delivered_at, status_created_at, status_delivered_at
+                )
+                VALUES (
+                    src.shipment_id, src.carrier_id, src.carrier_name, src.origin_city, src.origin_pincode, src.warehouse_id,
+                    src.destination_city, src.destination_pincode, src.customer_address_type,
+                    src.order_id, src.seller_id, src.channel,
+                    src.shipping_cost, src.fuel_surcharge, src.insurance, src.cod_fee,
+                    src.status, src.rto_flag, src.delay_flag, src.delivery_tat_days,
+                    src.created_at, src.delivered_at, src.status_created_at, src.status_delivered_at
+                );, parameters: None
+[2025-09-12T15:47:11.888+0000] {sql.py:479} INFO - Rows affected: 988
+[2025-09-12T15:47:11.902+0000] {snowflake.py:407} INFO - Rows affected: 988
+[2025-09-12T15:47:11.923+0000] {snowflake.py:408} INFO - Snowflake query id: 01bf0113-3201-ee12-000f-7c620002fe4e
+[2025-09-12T15:47:12.495+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-09-12T15:47:13.991+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=2_logistics_shipment_dag, task_id=json_flatten_insert_snowflake_fact, run_id=manual__2025-09-12T15:45:03.098344+00:00, execution_date=20250912T154503, start_date=20250912T154706, end_date=20250912T154713
+[2025-09-12T15:47:14.379+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2025-09-12T15:47:15.021+0000] {taskinstance.py:3498} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-09-12T15:47:15.025+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

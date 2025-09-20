@@ -1,0 +1,10 @@
+name,key,value,description
+shipments,last_shipment_loaded_at,2025-07-01 23:00:00,Latest shipment processed timestamp
+shipments,excluded_pincodes,"600001,110001,700001",Blacklisted delivery zones
+shipments,enable_rto_metrics,true,Flag to toggle RTO metrics
+customer_experience_summary,last_order_loaded_at,2025-07-01 00:00:00,Only include orders after this timestamp
+customer_experience_summary,excluded_customer_ids,"C101,C102",Blacklist of bad customers
+customer_experience_summary,enable_delay_metrics,true,Toggle delay metrics calculation
+customer_experience_summary,min_order_amount,500,Minmum order Filter
+customer_experience_summary,only_registered_customers,true,Registrated customer 
+customer_experience_summary,region_filter,"North,South",Region filter 

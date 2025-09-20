@@ -1,0 +1,8 @@
+snowflake:
+  user: eclipse
+  password: Devinetreat-100
+  account: XPUKXIG-FZ05602
+  warehouse: COMPUTE_WH
+  database: LOGISTICS_DEMO_1
+  schema: SILVER
+  role: ACCOUNTADMIN

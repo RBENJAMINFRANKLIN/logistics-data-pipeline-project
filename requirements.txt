@@ -1,0 +1,8 @@
+dbt-core
+dbt-snowflake
+snowflake-connector-python
+apache-airflow-providers-snowflake
+protobuf<5.0.0,!=3.20.0,!=3.20.1
+boto3
+snowflake-snowpark-python
+scikit-learn

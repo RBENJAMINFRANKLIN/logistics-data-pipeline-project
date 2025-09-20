@@ -1,0 +1,26 @@
+demo1:
+  outputs:
+    dev:
+      account: XPUKXIG-FZ05602
+      database: demo3
+      password: Devinetreat-100
+      role: ACCOUNTADMIN
+      schema: DEMO3SCHEMA
+      threads: 4
+      type: snowflake
+      user: victor24
+      warehouse: COMPUTE_WH
+  target: dev
+logistics_project:
+  outputs:
+    dev:
+      account: XPUKXIG-FZ05602
+      database: LOGISTICS_DEMO_1
+      password: Devinetreat-100
+      role: ACCOUNTADMIN
+      schema: BRONZE
+      threads: 3
+      type: snowflake
+      user: eclipse
+      warehouse: COMPUTE_WH
+  target: dev

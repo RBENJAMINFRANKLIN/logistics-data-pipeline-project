@@ -1,0 +1,1 @@
+[2025-09-12T17:16:41.841+0000] {task_context_logger.py:104} ERROR - Executor reports task instance <TaskInstance: 3_logistics_gold_metrics_dbt.shipment_delay_analysis manual__2025-09-12T17:12:36.715985+00:00 [queued]> finished (failed) although the task says it's queued. (Info: None) Was the task killed externally?

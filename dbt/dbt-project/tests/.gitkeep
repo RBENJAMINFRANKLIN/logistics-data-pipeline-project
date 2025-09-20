@@ -1,0 +1,23 @@
+version: 2
+
+unit_tests:
+  - name: test__delivery_performance_by_courier
+    description: "Ensure correct aggregation of delivery metrics by courier"
+    model: delivery_performance_by_courier
+
+    given:
+      - input: ref('FACT_SHIPMENTS')
+        rows:
+          - { CARRIER_ID: "C001", CARRIER_NAME: "Delhivery", DELIVERY_TAT_DAYS: 2, DELAY_FLAG: true }
+          - { CARRIER_ID: "C001", CARRIER_NAME: "Delhivery", DELIVERY_TAT_DAYS: 3, DELAY_FLAG: false }
+          - { CARRIER_ID: "C002", CARRIER_NAME: "BlueDart", DELIVERY_TAT_DAYS: 5, DELAY_FLAG: true }
+
+      - input: ref('DIM_COURIER')
+        rows:
+          - { COURIER_ID: "C001", COURIER_NAME: "Delhivery" }
+          - { COURIER_ID: "C002", COURIER_NAME: "BlueDart" }
+
+    expect:
+      rows:
+        - { CARRIER_NAME: "Delhivery", total_shipments: 2, avg_delivery_days: 2.5, delay_percentage: 50.0 }
+        - { CARRIER_NAME: "BlueDart", total_shipments: 1, avg_delivery_days: 5.0, delay_percentage: 100.0 }

@@ -1,0 +1,92 @@
+[2025-09-11T12:40:35.533+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-09-11T12:40:35.828+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 1_logistics_airbyte_ingestion_dbt_silver.dbt_test manual__2025-09-11T12:39:15.736511+00:00 [queued]>
+[2025-09-11T12:40:35.911+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 1_logistics_airbyte_ingestion_dbt_silver.dbt_test manual__2025-09-11T12:39:15.736511+00:00 [queued]>
+[2025-09-11T12:40:35.913+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2025-09-11T12:40:36.284+0000] {taskinstance.py:2330} INFO - Executing <Task(BashOperator): dbt_test> on 2025-09-11 12:39:15.736511+00:00
+[2025-09-11T12:40:36.406+0000] {standard_task_runner.py:63} INFO - Started process 591 to run task
+[2025-09-11T12:40:36.431+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', '1_logistics_airbyte_ingestion_dbt_silver', 'dbt_test', 'manual__2025-09-11T12:39:15.736511+00:00', '--job-id', '1062', '--raw', '--subdir', 'DAGS_FOLDER/1_logistics-airbyte-dbt.py', '--cfg-path', '/tmp/tmpgt68j_c8']
+[2025-09-11T12:40:36.448+0000] {standard_task_runner.py:91} INFO - Job 1062: Subtask dbt_test
+[2025-09-11T12:40:37.564+0000] {task_command.py:426} INFO - Running <TaskInstance: 1_logistics_airbyte_ingestion_dbt_silver.dbt_test manual__2025-09-11T12:39:15.736511+00:00 [running]> on host 89a8f539dee9
+[2025-09-11T12:40:39.702+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_EMAIL='benjaminimp10@gmail.com' AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='1_logistics_airbyte_ingestion_dbt_silver' AIRFLOW_CTX_TASK_ID='dbt_test' AIRFLOW_CTX_EXECUTION_DATE='2025-09-11T12:39:15.736511+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-09-11T12:39:15.736511+00:00'
+[2025-09-11T12:40:39.710+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-09-11T12:40:40.084+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2025-09-11T12:40:40.099+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'cd /opt/airflow/dbt/dbt-project && dbt test']
+[2025-09-11T12:40:40.299+0000] {subprocess.py:86} INFO - Output:
+[2025-09-11T12:41:07.061+0000] {subprocess.py:93} INFO - [0m12:41:07  Running with dbt=1.8.8
+[2025-09-11T12:41:17.585+0000] {subprocess.py:93} INFO - [0m12:41:17  Registered adapter: snowflake=1.8.4
+[2025-09-11T12:41:19.407+0000] {subprocess.py:93} INFO - [0m12:41:19  Unable to do partial parsing because of a version mismatch
+[2025-09-11T12:41:42.351+0000] {subprocess.py:93} INFO - [0m12:41:42  [[33mWARNING[0m]: Deprecated functionality
+[2025-09-11T12:41:42.356+0000] {subprocess.py:93} INFO - The `tests` config has been renamed to `data_tests`. Please see
+[2025-09-11T12:41:42.360+0000] {subprocess.py:93} INFO - https://docs.getdbt.com/docs/build/data-tests#new-data_tests-syntax for more
+[2025-09-11T12:41:42.363+0000] {subprocess.py:93} INFO - information.
+[2025-09-11T12:41:44.138+0000] {subprocess.py:93} INFO - [0m12:41:44  [[33mWARNING[0m]: Test 'test.logistics_project.source_relationships_LOGISTICS_RAW_inventory_PRODUCT_ID__PRODUCT_ID__ref_product_.f4aee8c92f' (models/schema.yml) depends on a node named 'product' in package '' which was not found
+[2025-09-11T12:41:44.140+0000] {subprocess.py:93} INFO - [0m12:41:44  [[33mWARNING[0m]: Test 'test.logistics_project.source_relationships_LOGISTICS_RAW_inventory_SELLER_ID__SELLER_ID__ref_seller_.1c2f5db1e9' (models/schema.yml) depends on a node named 'seller' in package '' which was not found
+[2025-09-11T12:41:44.145+0000] {subprocess.py:93} INFO - [0m12:41:44  [[33mWARNING[0m]: Test 'test.logistics_project.source_relationships_LOGISTICS_RAW_orders_CUSTOMER_ID__CUSTOMER_ID__ref_customers_.924af4fc27' (models/schema.yml) depends on a node named 'customers' in package '' which was not found
+[2025-09-11T12:41:44.148+0000] {subprocess.py:93} INFO - [0m12:41:44  [[33mWARNING[0m]: Test 'test.logistics_project.source_relationships_LOGISTICS_RAW_orders_PRODUCT_ID__PRODUCT_ID__ref_products_.c4706cdb93' (models/schema.yml) depends on a node named 'products' in package '' which was not found
+[2025-09-11T12:41:46.786+0000] {subprocess.py:93} INFO - [0m12:41:46  [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+[2025-09-11T12:41:46.799+0000] {subprocess.py:93} INFO - There are 1 unused configuration paths:
+[2025-09-11T12:41:46.805+0000] {subprocess.py:93} INFO - - snapshots.customers
+[2025-09-11T12:41:51.166+0000] {subprocess.py:93} INFO - [0m12:41:51  Found 18 models, 1 snapshot, 1 seed, 24 data tests, 8 sources, 726 macros
+[2025-09-11T12:41:51.185+0000] {subprocess.py:93} INFO - [0m12:41:51
+[2025-09-11T12:42:27.506+0000] {subprocess.py:93} INFO - [0m12:42:27  Concurrency: 3 threads (target='dev')
+[2025-09-11T12:42:27.509+0000] {subprocess.py:93} INFO - [0m12:42:27
+[2025-09-11T12:42:27.543+0000] {subprocess.py:93} INFO - [0m12:42:27  1 of 24 START test dbt_expectations_source_expect_column_values_to_be_between_LOGISTICS_RAW_inventory_STOCK__5000__0__True  [RUN]
+[2025-09-11T12:42:27.548+0000] {subprocess.py:93} INFO - [0m12:42:27  2 of 24 START test source_not_null_LOGISTICS_RAW_couriers_COURIER_ID ........... [RUN]
+[2025-09-11T12:42:27.551+0000] {subprocess.py:93} INFO - [0m12:42:27  3 of 24 START test source_not_null_LOGISTICS_RAW_couriers_NAME ................. [RUN]
+[2025-09-11T12:42:29.971+0000] {subprocess.py:93} INFO - [0m12:42:29  3 of 24 PASS source_not_null_LOGISTICS_RAW_couriers_NAME ....................... [[32mPASS[0m in 2.41s]
+[2025-09-11T12:42:29.997+0000] {subprocess.py:93} INFO - [0m12:42:29  1 of 24 PASS dbt_expectations_source_expect_column_values_to_be_between_LOGISTICS_RAW_inventory_STOCK__5000__0__True  [[32mPASS[0m in 2.43s]
+[2025-09-11T12:42:30.004+0000] {subprocess.py:93} INFO - [0m12:42:30  4 of 24 START test source_not_null_LOGISTICS_RAW_customers_CUSTOMER_ID ......... [RUN]
+[2025-09-11T12:42:30.011+0000] {subprocess.py:93} INFO - [0m12:42:30  2 of 24 PASS source_not_null_LOGISTICS_RAW_couriers_COURIER_ID ................. [[32mPASS[0m in 2.45s]
+[2025-09-11T12:42:30.052+0000] {subprocess.py:93} INFO - [0m12:42:30  5 of 24 START test source_not_null_LOGISTICS_RAW_customers_EMAIL ............... [RUN]
+[2025-09-11T12:42:30.099+0000] {subprocess.py:93} INFO - [0m12:42:30  6 of 24 START test source_not_null_LOGISTICS_RAW_inventory_ID .................. [RUN]
+[2025-09-11T12:42:31.913+0000] {subprocess.py:93} INFO - [0m12:42:31  4 of 24 PASS source_not_null_LOGISTICS_RAW_customers_CUSTOMER_ID ............... [[32mPASS[0m in 1.89s]
+[2025-09-11T12:42:31.925+0000] {subprocess.py:93} INFO - [0m12:42:31  7 of 24 START test source_not_null_LOGISTICS_RAW_inventory_PRODUCT_ID .......... [RUN]
+[2025-09-11T12:42:32.136+0000] {subprocess.py:93} INFO - [0m12:42:32  6 of 24 PASS source_not_null_LOGISTICS_RAW_inventory_ID ........................ [[32mPASS[0m in 2.02s]
+[2025-09-11T12:42:32.166+0000] {subprocess.py:93} INFO - [0m12:42:32  8 of 24 START test source_not_null_LOGISTICS_RAW_inventory_SELLER_ID ........... [RUN]
+[2025-09-11T12:42:32.274+0000] {subprocess.py:93} INFO - [0m12:42:32  5 of 24 PASS source_not_null_LOGISTICS_RAW_customers_EMAIL ..................... [[32mPASS[0m in 2.17s]
+[2025-09-11T12:42:32.322+0000] {subprocess.py:93} INFO - [0m12:42:32  9 of 24 START test source_not_null_LOGISTICS_RAW_locations_LOCATION_ID ......... [RUN]
+[2025-09-11T12:42:33.125+0000] {subprocess.py:93} INFO - [0m12:42:33  7 of 24 PASS source_not_null_LOGISTICS_RAW_inventory_PRODUCT_ID ................ [[32mPASS[0m in 1.20s]
+[2025-09-11T12:42:33.207+0000] {subprocess.py:93} INFO - [0m12:42:33  10 of 24 START test source_not_null_LOGISTICS_RAW_locations_PINCODE ............ [RUN]
+[2025-09-11T12:42:33.323+0000] {subprocess.py:93} INFO - [0m12:42:33  8 of 24 PASS source_not_null_LOGISTICS_RAW_inventory_SELLER_ID ................. [[32mPASS[0m in 1.15s]
+[2025-09-11T12:42:33.370+0000] {subprocess.py:93} INFO - [0m12:42:33  11 of 24 START test source_not_null_LOGISTICS_RAW_orders_CUSTOMER_ID ........... [RUN]
+[2025-09-11T12:42:33.504+0000] {subprocess.py:93} INFO - [0m12:42:33  9 of 24 PASS source_not_null_LOGISTICS_RAW_locations_LOCATION_ID ............... [[32mPASS[0m in 1.18s]
+[2025-09-11T12:42:33.660+0000] {subprocess.py:93} INFO - [0m12:42:33  12 of 24 START test source_not_null_LOGISTICS_RAW_orders_ORDER_ID .............. [RUN]
+[2025-09-11T12:42:34.688+0000] {subprocess.py:93} INFO - [0m12:42:34  10 of 24 PASS source_not_null_LOGISTICS_RAW_locations_PINCODE .................. [[32mPASS[0m in 1.48s]
+[2025-09-11T12:42:34.708+0000] {subprocess.py:93} INFO - [0m12:42:34  13 of 24 START test source_not_null_LOGISTICS_RAW_orders_PRODUCT_ID ............ [RUN]
+[2025-09-11T12:42:34.823+0000] {subprocess.py:93} INFO - [0m12:42:34  11 of 24 PASS source_not_null_LOGISTICS_RAW_orders_CUSTOMER_ID ................. [[32mPASS[0m in 1.45s]
+[2025-09-11T12:42:34.896+0000] {subprocess.py:93} INFO - [0m12:42:34  14 of 24 START test source_not_null_LOGISTICS_RAW_products_PRODUCT_ID .......... [RUN]
+[2025-09-11T12:42:35.271+0000] {subprocess.py:93} INFO - [0m12:42:35  12 of 24 PASS source_not_null_LOGISTICS_RAW_orders_ORDER_ID .................... [[32mPASS[0m in 1.56s]
+[2025-09-11T12:42:35.287+0000] {subprocess.py:93} INFO - [0m12:42:35  15 of 24 START test source_not_null_LOGISTICS_RAW_products_PRODUCT_NAME ........ [RUN]
+[2025-09-11T12:42:36.192+0000] {subprocess.py:93} INFO - [0m12:42:36  13 of 24 PASS source_not_null_LOGISTICS_RAW_orders_PRODUCT_ID .................. [[32mPASS[0m in 1.48s]
+[2025-09-11T12:42:36.201+0000] {subprocess.py:93} INFO - [0m12:42:36  16 of 24 START test source_not_null_LOGISTICS_RAW_sellers_SELLER_ID ............ [RUN]
+[2025-09-11T12:42:36.517+0000] {subprocess.py:93} INFO - [0m12:42:36  14 of 24 PASS source_not_null_LOGISTICS_RAW_products_PRODUCT_ID ................ [[32mPASS[0m in 1.58s]
+[2025-09-11T12:42:36.537+0000] {subprocess.py:93} INFO - [0m12:42:36  17 of 24 START test source_not_null_LOGISTICS_RAW_sellers_SELLER_NAME .......... [RUN]
+[2025-09-11T12:42:36.617+0000] {subprocess.py:93} INFO - [0m12:42:36  15 of 24 PASS source_not_null_LOGISTICS_RAW_products_PRODUCT_NAME .............. [[32mPASS[0m in 1.32s]
+[2025-09-11T12:42:36.654+0000] {subprocess.py:93} INFO - [0m12:42:36  18 of 24 START test source_unique_LOGISTICS_RAW_couriers_COURIER_ID ............ [RUN]
+[2025-09-11T12:42:37.656+0000] {subprocess.py:93} INFO - [0m12:42:37  16 of 24 PASS source_not_null_LOGISTICS_RAW_sellers_SELLER_ID .................. [[32mPASS[0m in 1.45s]
+[2025-09-11T12:42:37.673+0000] {subprocess.py:93} INFO - [0m12:42:37  19 of 24 START test source_unique_LOGISTICS_RAW_customers_CUSTOMER_ID .......... [RUN]
+[2025-09-11T12:42:38.189+0000] {subprocess.py:93} INFO - [0m12:42:38  17 of 24 PASS source_not_null_LOGISTICS_RAW_sellers_SELLER_NAME ................ [[32mPASS[0m in 1.65s]
+[2025-09-11T12:42:38.241+0000] {subprocess.py:93} INFO - [0m12:42:38  20 of 24 START test source_unique_LOGISTICS_RAW_inventory_ID ................... [RUN]
+[2025-09-11T12:42:38.319+0000] {subprocess.py:93} INFO - [0m12:42:38  18 of 24 PASS source_unique_LOGISTICS_RAW_couriers_COURIER_ID .................. [[32mPASS[0m in 1.65s]
+[2025-09-11T12:42:38.338+0000] {subprocess.py:93} INFO - [0m12:42:38  21 of 24 START test source_unique_LOGISTICS_RAW_locations_LOCATION_ID .......... [RUN]
+[2025-09-11T12:42:38.966+0000] {subprocess.py:93} INFO - [0m12:42:38  19 of 24 PASS source_unique_LOGISTICS_RAW_customers_CUSTOMER_ID ................ [[32mPASS[0m in 1.29s]
+[2025-09-11T12:42:38.973+0000] {subprocess.py:93} INFO - [0m12:42:38  22 of 24 START test source_unique_LOGISTICS_RAW_orders_ORDER_ID ................ [RUN]
+[2025-09-11T12:42:39.561+0000] {subprocess.py:93} INFO - [0m12:42:39  20 of 24 PASS source_unique_LOGISTICS_RAW_inventory_ID ......................... [[32mPASS[0m in 1.29s]
+[2025-09-11T12:42:39.572+0000] {subprocess.py:93} INFO - [0m12:42:39  23 of 24 START test source_unique_LOGISTICS_RAW_products_PRODUCT_ID ............ [RUN]
+[2025-09-11T12:42:39.684+0000] {subprocess.py:93} INFO - [0m12:42:39  21 of 24 PASS source_unique_LOGISTICS_RAW_locations_LOCATION_ID ................ [[32mPASS[0m in 1.32s]
+[2025-09-11T12:42:39.729+0000] {subprocess.py:93} INFO - [0m12:42:39  24 of 24 START test source_unique_LOGISTICS_RAW_sellers_SELLER_ID .............. [RUN]
+[2025-09-11T12:42:40.298+0000] {subprocess.py:93} INFO - [0m12:42:40  22 of 24 PASS source_unique_LOGISTICS_RAW_orders_ORDER_ID ...................... [[32mPASS[0m in 1.32s]
+[2025-09-11T12:42:40.839+0000] {subprocess.py:93} INFO - [0m12:42:40  23 of 24 PASS source_unique_LOGISTICS_RAW_products_PRODUCT_ID .................. [[32mPASS[0m in 1.26s]
+[2025-09-11T12:42:41.042+0000] {subprocess.py:93} INFO - [0m12:42:41  24 of 24 PASS source_unique_LOGISTICS_RAW_sellers_SELLER_ID .................... [[32mPASS[0m in 1.31s]
+[2025-09-11T12:42:41.061+0000] {subprocess.py:93} INFO - [0m12:42:41
+[2025-09-11T12:42:41.064+0000] {subprocess.py:93} INFO - [0m12:42:41  Finished running 24 data tests in 0 hours 0 minutes and 49.87 seconds (49.87s).
+[2025-09-11T12:42:41.359+0000] {subprocess.py:93} INFO - [0m12:42:41
+[2025-09-11T12:42:41.366+0000] {subprocess.py:93} INFO - [0m12:42:41  [32mCompleted successfully[0m
+[2025-09-11T12:42:41.374+0000] {subprocess.py:93} INFO - [0m12:42:41
+[2025-09-11T12:42:41.385+0000] {subprocess.py:93} INFO - [0m12:42:41  Done. PASS=24 WARN=0 ERROR=0 SKIP=0 TOTAL=24
+[2025-09-11T12:42:48.838+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2025-09-11T12:42:48.841+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-09-11T12:42:48.986+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=1_logistics_airbyte_ingestion_dbt_silver, task_id=dbt_test, run_id=manual__2025-09-11T12:39:15.736511+00:00, execution_date=20250911T123915, start_date=20250911T124035, end_date=20250911T124248
+[2025-09-11T12:42:49.156+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2025-09-11T12:42:49.284+0000] {taskinstance.py:3498} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-09-11T12:42:49.403+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

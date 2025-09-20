@@ -1,0 +1,22 @@
+[2025-09-20T04:42:12.694+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-09-20T04:42:12.853+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 4_logistics_ticket_classifier_full_dag.fetch_snowflake_data manual__2025-09-18T11:08:23.319503+00:00 [queued]>
+[2025-09-20T04:42:12.902+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 4_logistics_ticket_classifier_full_dag.fetch_snowflake_data manual__2025-09-18T11:08:23.319503+00:00 [queued]>
+[2025-09-20T04:42:12.904+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2025-09-20T04:42:13.041+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): fetch_snowflake_data> on 2025-09-18 11:08:23.319503+00:00
+[2025-09-20T04:42:13.068+0000] {standard_task_runner.py:63} INFO - Started process 200 to run task
+[2025-09-20T04:42:13.076+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', '4_logistics_ticket_classifier_full_dag', 'fetch_snowflake_data', 'manual__2025-09-18T11:08:23.319503+00:00', '--job-id', '1096', '--raw', '--subdir', 'DAGS_FOLDER/4_logistics_ticket_classifier_full_dag.py', '--cfg-path', '/tmp/tmpuhnsidh5']
+[2025-09-20T04:42:13.092+0000] {standard_task_runner.py:91} INFO - Job 1096: Subtask fetch_snowflake_data
+[2025-09-20T04:42:13.357+0000] {task_command.py:426} INFO - Running <TaskInstance: 4_logistics_ticket_classifier_full_dag.fetch_snowflake_data manual__2025-09-18T11:08:23.319503+00:00 [running]> on host 9d1b71842418
+[2025-09-20T04:42:13.686+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='4_logistics_ticket_classifier_full_dag' AIRFLOW_CTX_TASK_ID='fetch_snowflake_data' AIRFLOW_CTX_EXECUTION_DATE='2025-09-18T11:08:23.319503+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-09-18T11:08:23.319503+00:00'
+[2025-09-20T04:42:13.690+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-09-20T04:42:13.755+0000] {connection.py:521} INFO - Snowflake Connector for Python Version: 3.17.3, Python Version: 3.11.9, Platform: Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.36
+[2025-09-20T04:42:13.759+0000] {connection.py:1464} INFO - Connecting to GLOBAL Snowflake domain
+[2025-09-20T04:42:14.396+0000] {credentials.py:1278} INFO - Found credentials in shared credentials file: ~/.aws/credentials
+[2025-09-20T04:42:15.933+0000] {python.py:237} INFO - Done. Returned value was: Empty DataFrame
+Columns: [TICKET_ID, CUSTOMER_ID, MESSAGE_TEXT, TICKET_CATEGORY]
+Index: []
+[2025-09-20T04:42:15.934+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-09-20T04:42:16.025+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=4_logistics_ticket_classifier_full_dag, task_id=fetch_snowflake_data, run_id=manual__2025-09-18T11:08:23.319503+00:00, execution_date=20250918T110823, start_date=20250920T044212, end_date=20250920T044216
+[2025-09-20T04:42:16.150+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2025-09-20T04:42:16.212+0000] {taskinstance.py:3498} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-09-20T04:42:16.228+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

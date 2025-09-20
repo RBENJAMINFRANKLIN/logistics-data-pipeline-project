@@ -1,0 +1,45 @@
+[2025-09-18T06:42:37.790+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-09-18T06:42:38.211+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: 3_logistics_gold_metrics_dbt.dbt_run_test manual__2025-09-18T06:40:04.308809+00:00 [queued]>
+[2025-09-18T06:42:38.339+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: 3_logistics_gold_metrics_dbt.dbt_run_test manual__2025-09-18T06:40:04.308809+00:00 [queued]>
+[2025-09-18T06:42:38.340+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2025-09-18T06:42:38.608+0000] {taskinstance.py:2330} INFO - Executing <Task(BashOperator): dbt_run_test> on 2025-09-18 06:40:04.308809+00:00
+[2025-09-18T06:42:38.671+0000] {standard_task_runner.py:63} INFO - Started process 336 to run task
+[2025-09-18T06:42:38.707+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', '3_logistics_gold_metrics_dbt', 'dbt_run_test', 'manual__2025-09-18T06:40:04.308809+00:00', '--job-id', '1079', '--raw', '--subdir', 'DAGS_FOLDER/3_logistics-gold-metrics-dbt.py', '--cfg-path', '/tmp/tmppx09j2ci']
+[2025-09-18T06:42:38.749+0000] {standard_task_runner.py:91} INFO - Job 1079: Subtask dbt_run_test
+[2025-09-18T06:42:39.843+0000] {task_command.py:426} INFO - Running <TaskInstance: 3_logistics_gold_metrics_dbt.dbt_run_test manual__2025-09-18T06:40:04.308809+00:00 [running]> on host 9d1b71842418
+[2025-09-18T06:42:40.279+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='data_eng' AIRFLOW_CTX_DAG_ID='3_logistics_gold_metrics_dbt' AIRFLOW_CTX_TASK_ID='dbt_run_test' AIRFLOW_CTX_EXECUTION_DATE='2025-09-18T06:40:04.308809+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-09-18T06:40:04.308809+00:00'
+[2025-09-18T06:42:40.284+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-09-18T06:42:40.332+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2025-09-18T06:42:40.335+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'cd /opt/airflow/dbt/dbt-project && dbt test']
+[2025-09-18T06:42:40.376+0000] {subprocess.py:86} INFO - Output:
+[2025-09-18T06:42:56.275+0000] {subprocess.py:93} INFO - [0m06:42:56  Running with dbt=1.8.8
+[2025-09-18T06:43:03.174+0000] {subprocess.py:93} INFO - [0m06:43:03  Registered adapter: snowflake=1.8.4
+[2025-09-18T06:43:03.300+0000] {subprocess.py:93} INFO - [0m06:43:03  Encountered an error:
+[2025-09-18T06:43:03.302+0000] {subprocess.py:93} INFO - Runtime Error
+[2025-09-18T06:43:03.304+0000] {subprocess.py:93} INFO -   Failed to read package: Runtime Error
+[2025-09-18T06:43:03.306+0000] {subprocess.py:93} INFO -     No dbt_project.yml found at expected path /opt/airflow/dbt/dbt-project/dbt_packages/dbt-expectations-0.10.3/dbt_project.yml
+[2025-09-18T06:43:03.308+0000] {subprocess.py:93} INFO -     Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+[2025-09-18T06:43:03.320+0000] {subprocess.py:93} INFO - 
+[2025-09-18T06:43:03.327+0000] {subprocess.py:93} INFO - 
+[2025-09-18T06:43:03.333+0000] {subprocess.py:93} INFO - Error encountered in /opt/airflow/dbt/dbt-project/dbt_packages/dbt-expectations-0.10.3
+[2025-09-18T06:43:08.616+0000] {subprocess.py:97} INFO - Command exited with return code 2
+[2025-09-18T06:43:08.620+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-09-18T06:43:08.691+0000] {taskinstance.py:2905} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 465, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 432, in _execute_callable
+    return execute_callable(context=context, **execute_callable_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/baseoperator.py", line 400, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/bash.py", line 243, in execute
+    raise AirflowException(
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 2.
+[2025-09-18T06:43:08.721+0000] {taskinstance.py:1206} INFO - Marking task as FAILED. dag_id=3_logistics_gold_metrics_dbt, task_id=dbt_run_test, run_id=manual__2025-09-18T06:40:04.308809+00:00, execution_date=20250918T064004, start_date=20250918T064238, end_date=20250918T064308
+[2025-09-18T06:43:08.878+0000] {standard_task_runner.py:110} ERROR - Failed to execute job 1079 for task dbt_run_test (Bash command failed. The command returned a non-zero exit code 2.; 336)
+[2025-09-18T06:43:08.989+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 1
+[2025-09-18T06:43:09.110+0000] {taskinstance.py:3498} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-09-18T06:43:09.220+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

@@ -1,0 +1,45 @@
+version: 2
+
+unit_tests:
+  - name: test__delivery_sla_rootcause
+    model: delivery_sla_rootcause
+    description: "Validates root cause SLA logic and seller details"
+
+    given:
+      - input: ref('fact_orders')
+        rows:
+          - { ORDER_ID: "O1", ORDER_DATE: "2024-01-01", PRODUCT_ID: "P1", CUSTOMER_ID: "C1", TOTAL_AMOUNT: 500, PAYMENT_METHOD: "COD" }
+          - { ORDER_ID: "O2", ORDER_DATE: "2024-01-02", PRODUCT_ID: "P1", CUSTOMER_ID: "C2", TOTAL_AMOUNT: 700, PAYMENT_METHOD: "Prepaid" }
+
+      - input: source('silver', 'FACT_SHIPMENTS')
+        rows:
+          - { SHIPMENT_ID: "S1", ORDER_ID: "O1", SELLER_ID: "S001", CARRIER_ID: "C100", CHANNEL: "App", CREATED_AT: "2024-01-02", DELIVERED_AT: "2024-01-05", DELIVERY_TAT_DAYS: 2, DELAY_FLAG: true, RTO_FLAG: true, DESTINATION_PINCODE: "560001", STATUS: "Delivered" }
+          - { SHIPMENT_ID: "S2", ORDER_ID: "O2", SELLER_ID: "S001", CARRIER_ID: "C100", CHANNEL: "Web", CREATED_AT: "2024-01-03", DELIVERED_AT: "2024-01-04", DELIVERY_TAT_DAYS: 2, DELAY_FLAG: false, RTO_FLAG: false, DESTINATION_PINCODE: "560001", STATUS: "Delivered" }
+
+      - input: ref('dim_sellers')
+        rows:
+          - { SELLER_ID: "S001", SELLER_NAME: "ShopX" }
+
+      - input: ref('dim_couriers')
+        rows:
+          - { COURIER_ID: "C100", NAME: "Delhivery" }
+
+      - input: ref('dim_locations')
+        rows:
+          - { PINCODE: "560001", CITY: "Bangalore" }
+
+    expect:
+      rows:
+        - {
+            SELLER_NAME: "ShopX",
+            CARRIER_NAME: "Delhivery",
+            destination_city: "Bangalore",
+            total_deliveries: 2,
+            delayed_shipments: 1,
+            avg_delivery_time: 3.0,
+            avg_fulfillment_lag: 1.0,
+            avg_courier_lag: 2.0,
+            seller_root_causes: 0,
+            courier_root_causes: 1,
+            delay_rate_percentage: 50.0
+          }
